@@ -17,21 +17,29 @@ export default class AuthService{
                 salt : salt.toString(),
                 password : hashPassword
             })
-            const token = this.generateToken(userRecord);
+       
+            if (!userRecord) { throw new Error('User cannot be created') }
 
-            if (!userRecord) {
-                throw new Error('User cannot be created');
-            }
-
-            const user = userRecord.toObject();
-            Reflect.deleteProperty(user, 'password');
-            Reflect.deleteProperty(user, 'salt');
-            return { user, token };
+            return this.returnUser(userRecord)
 
         } catch (error) {
             throw(error)
         }
         
+    }
+
+    async SignIn(userInfo){
+        try{
+            const userRecord = await this.userModel.findOne({email : userInfo.email})
+            const verified = await bcrypt.compare(userInfo.password, userRecord.password)
+
+            if(!verified) { throw new Error('The password is not correct') }
+
+            return this.returnUser(userRecord)
+
+        }catch(error){
+            throw(error)
+        }
     }
 
     generateToken(user) {
@@ -40,13 +48,21 @@ export default class AuthService{
         exp.setDate(today.getDate() + 60);
 
         return jwt.sign(
-          {
+            {
             _id: user._id, // We are gonna use this in the middleware 'isAuth'
             role: user.role,
             name: user.name,
             exp: exp.getTime() / 1000,
-          },
-          config.jwtSecret,
+            },
+            config.jwtSecret,
         );
-      }
+    }
+
+    returnUser(userRecord){
+        const token = this.generateToken(userRecord);
+        const user = userRecord.toObject();
+        Reflect.deleteProperty(user, 'password');
+        Reflect.deleteProperty(user, 'salt');
+        return { user, token };
+    }
 }

@@ -1,6 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors"
-import routes from "../controller/routes-index.js"
+import routes from "../api/routes-index.js"
 import config from '../config/config.js';
 
 export default (app) => {
@@ -41,9 +41,11 @@ export default (app) => {
     app.use((err, req, res, next) => {
         res.status(err.status || 500);
         res.json({
-        errors: {
-            message: err.message,
-        },
+            errors: {
+                message: err.message,
+                name: err.name,
+                code: err.code
+            },
         });
     });
 
