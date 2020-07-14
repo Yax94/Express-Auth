@@ -6,6 +6,6 @@ export default async (expressApp) => {
     expressLoader(expressApp)
     console.log("🔵 Express loaded")
 
-    await mongooseLoader(expressApp)
+    await mongooseLoader()
     console.log("🔵 Mongoose loaded")
 }

@@ -12,11 +12,13 @@ export default class AuthService{
         try {
             const salt = await bcrypt.genSalt(10) 
             const hashPassword = await bcrypt.hash(userInput.password, salt)
+            
             const userRecord = await this.userModel.create({
                 ...userInput,
                 salt : salt.toString(),
                 password : hashPassword
             })
+            
        
             if (!userRecord) { throw new Error('User cannot be created') }
 

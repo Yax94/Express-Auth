@@ -10,5 +10,5 @@ export default async () => {
     const connection = await mongoose.connect(config.databaseURL)
         .catch((err) => { console.log(err) });
 
-    return connection.connection.db;
+    return connection;
 };

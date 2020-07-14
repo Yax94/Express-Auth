@@ -2,9 +2,13 @@ import dotenv from "dotenv"
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-if(dotenv.config().error){
+if(process.env.NODE_ENV !== 'production' && dotenv.config().error){
     throw new Error("⚠️ Couldn't find env file ⚠️")
 }
+
+
+var envString = process.env.NODE_ENV.toUpperCase()
+
 
 export default {
     /**
@@ -15,7 +19,8 @@ export default {
     /**
     * Database information (mongodb = url)
     **/
-    databaseURL : process.env.MONGODB_URI,
+
+    databaseURL : process.env['MONGODB_URI_' + envString],
 
     /**
     * JWT token secret key

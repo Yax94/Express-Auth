@@ -5,8 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "test": "NODE_ENV=test mocha",
+    "start": "NODE_ENV=development nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -24,12 +24,15 @@
   },
   "homepage": "https://github.com/Yax94/Express-Auth#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
+    "mocha": "^8.0.1",
     "mongoose": "^5.9.23"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.4"
   }
