@@ -16,35 +16,35 @@ describe('AuthentificationService', function() {
 
     // add a test hook
     before(async function() {
-        // ...some logic before each test is run
+        
         this.db = await mongoLoader()
 
         await User.collection.drop().catch((err) => {console.log("error in drop", err);})
         
-        const testUser = {
+        this.testUser = {
             email : "bcdegffrre@tffdfestfff.fr",
             password : "pafdfss",
             name : "name"
         }
 
-
-        return authService.SignUp(testUser).then((user) => {
+    
+        return authService.SignUp(this.testUser).then((user) => {
             this.user = user
         }).catch((err) => {console.log(err);})
         
         
 
     })
+
     after(function(){
         this.db.disconnect()
     })
 
 
-
-    context('SignUp User returned', function() {       
+    context('SignUp User returned', function() {  
+        
+        console.log("Signup context called");
          
-
-
         it('Contains user property', function() {
             assert.property(this.user, "user")
         })
@@ -52,7 +52,37 @@ describe('AuthentificationService', function() {
             assert.property(this.user, "token")
         })
     })
-    // ...some more tests
+
+    context('SignIn User', function() {     
+        
+        
+        
+        
+
+        it('Can sign in valid user', async function() {
+            const {email, password} = this.testUser
+            return authService.SignIn({email, password}).then((returnedUser) => {
+                assert.isDefined(returnedUser, "the user signed in is defined")
+                assert.property(returnedUser, "token", "the user contains the token")
+                assert.notEqual(returnedUser.token, this.user.token, "token is changed after sign in")
+            })
+        })
+        it('Can\'t sign in unvalid user', async function() {
+            const {email, password} = this.testUser
+            return authService.SignIn({email, password : (password + " ")}).then((returnedUser) => {
+                assert.isUndefined(returnedUser, "the user signed in is undefined")
+            }).catch((err) => {
+                assert.isDefined(err, "An error is defined")
+                assert.include(err.message, 'password', "the error includes the password word")
+            })
+        })
+    })
+    
+    context('Token can be verified', function(){
+        it('Token returned by user is valid', function(){
+            assert.fail("token assert")
+        })
+    })
 
 })
 
