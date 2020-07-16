@@ -27,7 +27,7 @@ describe('AuthentificationService', function() {
         this.db = await mongoLoader()
         expressLoader(this.app)
 
-        await User.collection.drop().catch((err) => {console.log("error in drop", err);})
+        
         
         this.testUser = {
             email : "bcdegffrre@tffdfestfff.fr",
@@ -44,8 +44,12 @@ describe('AuthentificationService', function() {
 
     })
 
-    after(function(){
-        this.db.disconnect()
+    after(function(done){
+        User.collection.drop((err, result) => {
+            this.db.disconnect()
+            done()
+        })
+        
     })
 
 
@@ -102,10 +106,10 @@ describe('AuthentificationService', function() {
         it('Can acces middleware with valid token', function(){
             chai.request(this.app)
               .get('/api/user/me')
+              .set('Authorization', "Token " + this.user.token)
               .end(function(err, res){
                 assert.isNull(err, "error is null")
-                assert.equal(res.status, 401, "status equal to 401")
-                assert.property(res.body, "error", "Path contains error message")
+                assert.equal(res.status, 200, "status equal to 401")  
             })
         })
 
