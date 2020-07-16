@@ -32,7 +32,7 @@ export default (app) => {
         if (err.name === 'UnauthorizedError') {
         return res
             .status(err.status)
-            .send({ message: err.message })
+            .send({ error: err.message })
             .end();
         }
         return next(err);

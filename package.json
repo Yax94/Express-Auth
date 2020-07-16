@@ -25,6 +25,7 @@
   "homepage": "https://github.com/Yax94/Express-Auth#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chai-http": "^4.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",

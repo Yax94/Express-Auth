@@ -67,4 +67,8 @@ export default class AuthService{
         Reflect.deleteProperty(user, 'salt');
         return { user, token };
     }
+
+    validateToken(token, done){
+        jwt.verify(token, config.jwtSecret, done)
+    }
 }

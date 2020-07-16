@@ -6,7 +6,7 @@ import user from './routes/user.js';
 export default () => {
 	const app = express.Router();
 	
-	user("/users", app, express.Router());
+	user("/user", app, express.Router());
 	auth("/auth", app, express.Router());
 
 	return app
