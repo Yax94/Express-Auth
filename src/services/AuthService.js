@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import config from '../config/config.js'
-import AuthDataValidation from "../data_validation/AuthDataValidation.js"
+import AuthDataValidation from "../models/AuthDataValidation.js"
 
 
 export default class AuthService{
