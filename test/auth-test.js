@@ -32,7 +32,7 @@ describe('AuthentificationService', function() {
         this.testUser = {
             email : "bcdegffrre@tffdfestfff.fr",
             password : "pafdfss",
-            name : "name"
+            username : "name"
         }
 
     

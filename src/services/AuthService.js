@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import config from '../config/config.js'
+import AuthDataValidation from "../data_validation/AuthDataValidation.js"
 
 
 export default class AuthService{
@@ -10,6 +11,8 @@ export default class AuthService{
 
     async SignUp(userInput){
         try {
+            await AuthDataValidation.SignUpSchema.validateAsync(userInput)
+
             const salt = await bcrypt.genSalt(10) 
             const hashPassword = await bcrypt.hash(userInput.password, salt)
             
@@ -25,13 +28,21 @@ export default class AuthService{
             return this.returnUser(userRecord)
 
         } catch (error) {
-            throw(error)
+            if(error.code == 11000 && error.keyPattern.email){
+                throw(new Error("This mail address is already used"))
+            }else if (error.code == 11000 && error.keyPattern.username){
+                throw(new Error("This username is already used"))
+            }else{
+                throw(error)
+            }
         }
         
     }
 
     async SignIn(userInfo){
         try{
+            await AuthDataValidation.SignInSchema.validateAsync(userInfo)
+
             const userRecord = await this.userModel.findOne({email : userInfo.email})
             const verified = await bcrypt.compare(userInfo.password, userRecord.password)
 
