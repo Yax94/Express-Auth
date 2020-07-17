@@ -7,6 +7,7 @@ chai.use(chaiHttp)
 
 import AuthService from "../src/services/AuthService.js"
 import User from "../src/models/User.js"
+import AuthDataValidation from "../src/models/AuthDataValidation.js"
 import mongoLoader from "../src/loaders/mongoose.js"
 import expressLoader from "../src/loaders/express.js"
 
@@ -100,7 +101,7 @@ describe('AuthentificationService', function() {
         })
     })
     
-    context('Token can be verified', function(){
+    context('Token verification', function(){
         
 
         it('Can acces middleware with valid token', function(){
@@ -121,6 +122,130 @@ describe('AuthentificationService', function() {
                 assert.equal(res.status, 401, "status equal to 401")
                 assert.property(res.body, "error", "Path contains error message")
             })
+        })
+    })
+
+    context('Data validation', function(){
+        it("User should contain email property on SignUp", function(){
+
+            const user = {password: "aaaaaa", username: "aaa"}
+
+            chai.request(this.app)
+              .post('/api/auth/signup')
+              .send(user)
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "mail", "Error message contains mail keyword")
+            })
+        })
+
+        it("User should contain username property on SignUp", function(){
+
+            const user = {password: "aaaaaa", email: "aaa@aaa.com"}
+
+            chai.request(this.app)
+              .post('/api/auth/signup')
+              .send(user)
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "username", "Error message contains username keyword")
+            })
+        })
+
+        it("User should contain password property on SignUp", function(){
+
+            const user = {username: "aaaaaa", email: "aaa@aaa.com"}
+
+            chai.request(this.app)
+              .post('/api/auth/signup')
+              .send(user)
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "password", "Error message contains password keyword")
+            })
+        })
+
+        it("User should contains email property on SignIn", function(){
+
+            const user = {password: "aaaaaa"}
+
+            chai.request(this.app)
+              .post('/api/auth/signin')
+              .send(user)
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "mail", "Error message contains mail keyword")
+            })
+        })
+
+        it("User should contains password property on SignIn", function(){
+
+            const user = {email: "aaa@aaa.com"}
+
+            chai.request(this.app)
+              .post('/api/auth/signin')
+              .send(user)
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "password", "Error message contains password keyword")
+            })
+        })
+
+        it("Password should respect format", async function() {
+            const username = "aaaaa"
+            const email = "aaa@aaa.com"
+
+            var password = "eeeee"
+            var error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isDefined(error, "password should have at least 6 caracters")
+
+            var password = "eeeeee"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isUndefined(error, "password should have at least 6 caracters")
+        })
+
+        it("Email should respect format", async function() {
+            const username = "aaaaa"
+            const password = "aaaaaaa"
+            
+            var email = "eeeee"
+            var error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isDefined(error, "email should contain @")
+
+            email = "ee@eee"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isDefined(error, "email should contain .domain")
+
+            email = "ee@eee.fr"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isUndefined(error, ".fr domain accepted")
+
+            email = "ee@eee.com"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isUndefined(error, ".com domain accepted")
+
+            email = "ee@eee.net"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isUndefined(error, ".net domain accepted")
+
+            email = "ee@eee.de"
+            error = AuthDataValidation.SignUpSchema.validate({username, email, password}).error
+            assert.isDefined(error, "other domains not accepted")
         })
     })
 
