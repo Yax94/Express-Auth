@@ -12,6 +12,7 @@ import mongoLoader from "../src/loaders/mongoose.js"
 import expressLoader from "../src/loaders/express.js"
 
 import express from "express";
+import user from "../src/api/routes/user.js";
 
 // begin a test suite of one or more tests
 describe('AuthentificationService', function() {
@@ -126,7 +127,40 @@ describe('AuthentificationService', function() {
     })
 
     context('Data validation', function(){
-        it("User should contain email property on SignUp", function(){
+
+        it("Prevent from duplicate mail address", function(done){
+            var {email, username, password} = this.testUser
+            username = (username + "b")
+            chai.request(this.app)
+              .post("/api/auth/signup")
+              .send({email, username, password})
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "mail", "Error message contains mail keyword")
+                done()
+              })  
+        })
+
+        it("Prevent from duplicate username", function(done){
+            var {email, username, password} = this.testUser
+            email = ("b" + email)
+            chai.request(this.app)
+              .post("/api/auth/signup")
+              .send({email, username, password})
+              .end(function(err, res){
+                assert.isNull(err, "error is null")
+                assert.notEqual(res.status, 200, "status different from 200")
+                assert.notEqual(res.status, 404, "status different from 404 Not Found")
+                assert.property(res.body, "errors", "Path contains error message")
+                assert.include(res.body.errors.message, "username", "Error message contains username keyword")
+                done()
+              })  
+        })
+
+        it("User should contain email property on SignUp", function(done){
 
             const user = {password: "aaaaaa", username: "aaa"}
 
@@ -139,10 +173,11 @@ describe('AuthentificationService', function() {
                 assert.notEqual(res.status, 404, "status different from 404 Not Found")
                 assert.property(res.body, "errors", "Path contains error message")
                 assert.include(res.body.errors.message, "mail", "Error message contains mail keyword")
+                done()
             })
         })
 
-        it("User should contain username property on SignUp", function(){
+        it("User should contain username property on SignUp", function(done){
 
             const user = {password: "aaaaaa", email: "aaa@aaa.com"}
 
@@ -155,10 +190,11 @@ describe('AuthentificationService', function() {
                 assert.notEqual(res.status, 404, "status different from 404 Not Found")
                 assert.property(res.body, "errors", "Path contains error message")
                 assert.include(res.body.errors.message, "username", "Error message contains username keyword")
+                done()
             })
         })
 
-        it("User should contain password property on SignUp", function(){
+        it("User should contain password property on SignUp", function(done){
 
             const user = {username: "aaaaaa", email: "aaa@aaa.com"}
 
@@ -171,10 +207,11 @@ describe('AuthentificationService', function() {
                 assert.notEqual(res.status, 404, "status different from 404 Not Found")
                 assert.property(res.body, "errors", "Path contains error message")
                 assert.include(res.body.errors.message, "password", "Error message contains password keyword")
+                done()
             })
         })
 
-        it("User should contains email property on SignIn", function(){
+        it("User should contains email property on SignIn", function(done){
 
             const user = {password: "aaaaaa"}
 
@@ -187,10 +224,11 @@ describe('AuthentificationService', function() {
                 assert.notEqual(res.status, 404, "status different from 404 Not Found")
                 assert.property(res.body, "errors", "Path contains error message")
                 assert.include(res.body.errors.message, "mail", "Error message contains mail keyword")
+                done()
             })
         })
 
-        it("User should contains password property on SignIn", function(){
+        it("User should contains password property on SignIn", function(done){
 
             const user = {email: "aaa@aaa.com"}
 
@@ -203,6 +241,7 @@ describe('AuthentificationService', function() {
                 assert.notEqual(res.status, 404, "status different from 404 Not Found")
                 assert.property(res.body, "errors", "Path contains error message")
                 assert.include(res.body.errors.message, "password", "Error message contains password keyword")
+                done()
             })
         })
 

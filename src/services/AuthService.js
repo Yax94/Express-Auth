@@ -58,14 +58,13 @@ export default class AuthService{
     generateToken(user) {
         const today = new Date();
         const exp = new Date(today);
-        exp.setDate(today.getDate() + 60);
+        exp.setDate(today.getDate() + config.jwtTokenExp);
 
-        return jwt.sign(
-            {
-            _id: user._id, // We are gonna use this in the middleware 'isAuth'
-            role: user.role,
-            name: user.name,
-            exp: exp.getTime() / 1000,
+        return jwt.sign({
+                _id: user._id, 
+                role: user.role,
+                username: user.username,
+                exp: exp.getTime() / 1000,
             },
             config.jwtSecret,
         );

@@ -12,7 +12,7 @@ export default (name, app, router) => {
     router.use(middlewares.isAuth)
 
     router.get("/me", (req, res) => {
-        res.json({ok : "ok"}).status(200)
+        res.json(req.user).status(200)
     })
     
     app.use(name, router);

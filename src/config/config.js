@@ -22,14 +22,11 @@ export default {
     databaseURL : process.env['MONGODB_URI_' + envString],
 
     /**
-    * JWT token secret key
+    * JWT parametres
     **/
     jwtSecret: process.env.JWT_SECRET,
-
-    /**
-    * JWT alhorithm used
-    **/
     jwtAlgorthm: process.env.JWT_ALGORITHM || ['HS256'],
+    jwtTokenExp : process.env.JWT_EXP || 60,
 
     /**
     * API configs
